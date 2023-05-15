@@ -7,43 +7,45 @@ const ell = {
 const formData = {
     email: '',
     message: '',
-}
+};
 const FEEDBACK_STORAGE_KEY = 'feedback-form-state';
 
 ell.form.addEventListener('input', throttle(getFormValues, 500));
-setFormValues();
 ell.form.addEventListener('submit', submitFormValues);
+setFormValues();
 
 function getFormValues(e) {
-    if (localStorage.getItem(FEEDBACK_STORAGE_KEY)) {
-        const temporaryData = JSON.parse(localStorage.getItem(FEEDBACK_STORAGE_KEY));
-        formData.email = temporaryData.email;
-        formData.message = temporaryData.message;
-    }
 
-    if (e.target.name === 'email') {
-        formData.email = e.target.value;
-    }
-    if (e.target.name === 'message') {
-        formData.message = e.target.value;
+    switch (e.target.name) {
+        case 'email':
+            formData.email = e.target.value;
+            break;
+        case 'message':
+            formData.message = e.target.value;
+            break;
     }
 
     localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(formData));
 }
 
-function setFormValues() {
-    if (localStorage.getItem(FEEDBACK_STORAGE_KEY)) {
-        const temporaryData = JSON.parse(localStorage.getItem(FEEDBACK_STORAGE_KEY));
-
-        ell.email.value = temporaryData.email;
-        ell.message.value = temporaryData.message;
-    }
-}
-
 function submitFormValues(e) {
     e.preventDefault();
     ell.form.reset();
-    console.log(`Your email: ${formData.email} ---- and your message is: ${formData.message}`);
-
+    console.log(formData);
     localStorage.removeItem(FEEDBACK_STORAGE_KEY);
+    formData.email = '';
+    formData.message = '';
+}
+
+function setFormValues() {
+    const temporaryObject = JSON.parse(localStorage.getItem(FEEDBACK_STORAGE_KEY));
+    if (!temporaryObject) {
+        return;
+    }
+
+    formData.email = temporaryObject.email;
+    formData.message = temporaryObject.message;
+
+    ell.email.value = temporaryObject.email;
+    ell.message.value = temporaryObject.message;
 }
